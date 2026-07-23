@@ -3,9 +3,28 @@
  *
  * Uses CSS custom property --clock-brightness for dimming.
  * Audio continues playing in background while clock is visible.
+ * Acquires a Screen Wake Lock to prevent the display from sleeping.
  */
 
 let clockInterval = null;
+/** @type {WakeLockSentinel|null} */
+let wakeLock = null;
+
+async function acquireWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    // Re-acquire if the page regains visibility (e.g., after tab switch)
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch { /* user denied or not supported */ }
+}
+
+async function releaseWakeLock() {
+  if (wakeLock) {
+    await wakeLock.release().catch(() => {});
+    wakeLock = null;
+  }
+}
 
 export function initClockMode() {
   const overlay = document.getElementById('clock-overlay');
@@ -22,10 +41,12 @@ export function initClockMode() {
   });
 
   // Enter clock mode
-  btnFS.addEventListener('click', () => {
+  btnFS.addEventListener('click', async () => {
     overlay.classList.remove('hidden');
     updateClock(display);
     clockInterval = setInterval(() => updateClock(display), 1000);
+
+    await acquireWakeLock();
 
     // Try native fullscreen
     if (document.documentElement.requestFullscreen) {
@@ -34,10 +55,12 @@ export function initClockMode() {
   });
 
   // Exit on tap/click
-  overlay.addEventListener('click', () => {
+  overlay.addEventListener('click', async () => {
     overlay.classList.add('hidden');
     if (clockInterval) clearInterval(clockInterval);
     clockInterval = null;
+
+    await releaseWakeLock();
 
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {});
@@ -48,6 +71,13 @@ export function initClockMode() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
       overlay.click();
+    }
+  });
+
+  // Re-acquire wake lock when returning to the app (iOS releases it on visibility change)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !overlay.classList.contains('hidden')) {
+      acquireWakeLock();
     }
   });
 }
