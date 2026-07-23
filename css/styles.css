@@ -133,7 +133,8 @@ input[type="range"] {
   margin-bottom: 12px;
 }
 
-#viz-canvas {
+#viz-canvas,
+#noise-canvas {
   width: 100%;
   max-width: 800px;
   height: 200px;

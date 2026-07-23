@@ -13,6 +13,9 @@ let workletNode = null;
 /** @type {GainNode|null} */
 let noiseGain = null;
 
+/** @type {AnalyserNode|null} */
+let noiseAnalyser = null;
+
 let playing = false;
 let currentType = 'white';
 let workletReady = false;
@@ -42,8 +45,12 @@ export async function startNoise(type) {
     workletNode = new AudioWorkletNode(ctx, 'noise-processor');
     noiseGain = ctx.createGain();
     noiseGain.gain.value = 0.5;
+    noiseAnalyser = ctx.createAnalyser();
+    noiseAnalyser.fftSize = 2048;
+    noiseAnalyser.smoothingTimeConstant = 0.6;
     workletNode.connect(noiseGain);
-    noiseGain.connect(getMasterGain());
+    noiseGain.connect(noiseAnalyser);
+    noiseAnalyser.connect(getMasterGain());
   }
 
   workletNode.port.postMessage({ type: currentType });
@@ -57,6 +64,10 @@ export function stopNoise() {
   if (workletNode) {
     workletNode.disconnect();
     workletNode = null;
+  }
+  if (noiseAnalyser) {
+    noiseAnalyser.disconnect();
+    noiseAnalyser = null;
   }
   if (noiseGain) {
     noiseGain.disconnect();
@@ -89,4 +100,12 @@ export async function setNoiseVolume(v) {
 /** @returns {boolean} */
 export function isPlaying() {
   return playing;
+}
+
+/**
+ * Get the noise AnalyserNode for live visualisation.
+ * @returns {AnalyserNode|null}
+ */
+export function getNoiseAnalyser() {
+  return noiseAnalyser;
 }
