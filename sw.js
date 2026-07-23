@@ -1,4 +1,4 @@
-const CACHE_NAME = 'noisy-v1';
+const CACHE_NAME = 'noisy-v2';
 
 const ASSETS = [
   './',
