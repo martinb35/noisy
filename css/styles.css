@@ -1,0 +1,208 @@
+/* ===== Reset & base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --accent: #0f3460;
+  --text: #e0e0e0;
+  --text-dim: #8888aa;
+  --primary: #e94560;
+  --primary-hover: #ff6b81;
+  --clock-brightness: 0.6;
+  --radius: 8px;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ===== Tab bar ===== */
+#tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 2px solid var(--accent);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-bottom 0.2s;
+  border-bottom: 3px solid transparent;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* ===== Panels ===== */
+.panel {
+  display: none;
+  padding: 24px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.panel.active { display: block; }
+
+.panel h2 {
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+/* ===== Controls ===== */
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.control-group label {
+  min-width: 80px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+select, input[type="range"] {
+  accent-color: var(--primary);
+}
+
+select {
+  background: var(--accent);
+  color: var(--text);
+  border: 1px solid #334;
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+input[type="range"] {
+  width: 180px;
+  cursor: pointer;
+}
+
+/* ===== Buttons ===== */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: var(--primary-hover); }
+
+.btn-sm {
+  background: var(--accent);
+  color: var(--text-dim);
+  border: 1px solid #334;
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-sm.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* ===== Viz ===== */
+.viz-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#viz-canvas {
+  width: 100%;
+  max-width: 800px;
+  height: 200px;
+  background: #0d0d1a;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+/* ===== Sine sliders grid ===== */
+#sine-sliders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 10px;
+}
+
+.sine-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+.sine-row .label { min-width: 28px; color: var(--text-dim); font-weight: 600; }
+.sine-row input[type="range"] { width: 100px; }
+.sine-row .value { min-width: 55px; text-align: right; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+/* ===== Clock overlay ===== */
+#clock-overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  cursor: pointer;
+}
+#clock-overlay.hidden { display: none; }
+
+#clock-display {
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-size: clamp(4rem, 18vw, 14rem);
+  font-weight: 200;
+  color: rgba(255, 255, 255, var(--clock-brightness));
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+#clock-exit-hint {
+  margin-top: 20px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.15);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.clock-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .panel { padding: 16px 12px; }
+  #sine-sliders { grid-template-columns: 1fr; }
+  .sine-row input[type="range"] { width: 70px; }
+}
